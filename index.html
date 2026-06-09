@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Incident Comms</title>
+<style>
+  :root {
+    --purple: #490e6f;
+    --purple-mid: #6b1fa8;
+    --purple-light: #f3edf8;
+    --gold: #ffe100;
+    --gold-dark: #c9b000;
+    --white: #ffffff;
+    --gray-50: #fafafa;
+    --gray-100: #f4f4f5;
+    --gray-200: #e4e4e7;
+    --gray-400: #a1a1aa;
+    --gray-600: #52525b;
+    --gray-800: #27272a;
+    --green: #16a34a;
+    --green-light: #dcfce7;
+    --radius: 12px;
+    --radius-sm: 8px;
+    --shadow: 0 1px 3px rgba(0,0,0,.1), 0 1px 2px rgba(0,0,0,.06);
+    --shadow-md: 0 4px 6px rgba(0,0,0,.07), 0 2px 4px rgba(0,0,0,.06);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--gray-100);
+    color: var(--gray-800);
+    min-height: 100vh;
+    padding-bottom: 32px;
+  }
+
+  /* Login */
+  .login-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: var(--purple);
+    padding: 32px 24px;
+  }
+  .login-screen.hidden { display: none; }
+  .login-logo { font-size: 52px; margin-bottom: 16px; }
+  .login-screen h1 { font-size: 22px; font-weight: 800; color: var(--white); letter-spacing: -.3px; margin-bottom: 4px; }
+  .login-screen p { font-size: 14px; color: rgba(255,255,255,.5); margin-bottom: 32px; }
+  .login-box {
+    background: var(--white);
+    border-radius: var(--radius);
+    padding: 24px;
+    width: 100%;
+    max-width: 320px;
+    box-shadow: 0 8px 32px rgba(0,0,0,.3);
+  }
+  .login-box label { display: block; font-size: 12px; font-weight: 700; color: var(--gray-600); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; }
+  .login-box input {
+    width: 100%; border: 1.5px solid var(--gray-200); border-radius: var(--radius-sm);
+    font-size: 16px; padding: 11px 14px; outline: none; font-family: inherit;
+    margin-bottom: 12px; -webkit-appearance: none; transition: border-color .15s;
+  }
+  .login-box input:focus { border-color: var(--purple-mid); }
+  .btn-login {
+    width: 100%; background: var(--purple); color: var(--white); border: none;
+    border-radius: var(--radius-sm); padding: 13px; font-size: 15px; font-weight: 700;
+    cursor: pointer; -webkit-appearance: none;
+  }
+  .login-error { font-size: 13px; color: #dc2626; margin-top: 10px; text-align: center; display: none; }
+  .login-error.visible { display: block; }
+
+  .app-wrapper { display: none; }
+  .app-wrapper.visible { display: block; }
+
+  /* Header */
+  .header {
+    background: var(--purple);
+    padding: 16px 20px 14px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    box-shadow: 0 2px 8px rgba(73,14,111,.4);
+  }
+  .header-inner {
+    max-width: 600px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .header-icon {
+    width: 32px;
+    height: 32px;
+    background: var(--gold);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  .header h1 {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--white);
+    letter-spacing: -.2px;
+  }
+  .header p {
+    font-size: 12px;
+    color: rgba(255,255,255,.65);
+    margin-top: 1px;
+  }
+
+  /* Main */
+  .main {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 16px 16px 0;
+  }
+
+  /* Card */
+  .card {
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+  .card-header {
+    padding: 14px 16px 10px;
+    border-bottom: 1px solid var(--gray-100);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card-header-icon {
+    font-size: 15px;
+  }
+  .card-header h2 {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--purple);
+    text-transform: uppercase;
+    letter-spacing: .5px;
+  }
+  .card-body {
+    padding: 14px 16px;
+  }
+
+  /* Form elements */
+  label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--gray-600);
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: .4px;
+  }
+
+  input[type="text"], textarea, select {
+    width: 100%;
+    border: 1.5px solid var(--gray-200);
+    border-radius: var(--radius-sm);
+    font-size: 15px;
+    color: var(--gray-800);
+    background: var(--gray-50);
+    padding: 10px 12px;
+    outline: none;
+    transition: border-color .15s;
+    font-family: inherit;
+    -webkit-appearance: none;
+  }
+  input[type="text"]:focus, textarea:focus, select:focus {
+    border-color: var(--purple-mid);
+    background: var(--white);
+  }
+  textarea { resize: vertical; min-height: 80px; line-height: 1.5; }
+  select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2352525b' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 32px;
+    cursor: pointer;
+  }
+
+  .field { margin-bottom: 12px; }
+  .field:last-child { margin-bottom: 0; }
+
+  /* Tone chips */
+  .tone-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .tone-chip {
+    border: 1.5px solid var(--gray-200);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--gray-600);
+    background: var(--gray-50);
+    cursor: pointer;
+    transition: all .15s;
+    -webkit-appearance: none;
+    outline: none;
+  }
+  .tone-chip.active {
+    border-color: var(--purple);
+    background: var(--purple-light);
+    color: var(--purple);
+    font-weight: 600;
+  }
+
+  /* Output toggles */
+  .output-toggles {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .toggle-chip {
+    border: 1.5px solid var(--gray-200);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--gray-600);
+    background: var(--gray-50);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    transition: all .15s;
+    -webkit-appearance: none;
+    outline: none;
+    text-align: left;
+  }
+  .toggle-chip .check {
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    border: 1.5px solid var(--gray-200);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    transition: all .15s;
+  }
+  .toggle-chip.active {
+    border-color: var(--purple);
+    background: var(--purple-light);
+    color: var(--purple);
+    font-weight: 600;
+  }
+  .toggle-chip.active .check {
+    background: var(--purple);
+    border-color: var(--purple);
+    color: var(--white);
+  }
+
+  /* Generate button */
+  .btn-generate {
+    width: 100%;
+    background: var(--purple);
+    color: var(--white);
+    border: none;
+    border-radius: var(--radius);
+    padding: 16px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: background .15s, transform .1s;
+    margin-bottom: 12px;
+    letter-spacing: -.2px;
+    -webkit-appearance: none;
+    outline: none;
+  }
+  .btn-generate:active { transform: scale(.98); }
+  .btn-generate:disabled {
+    background: var(--gray-400);
+    cursor: not-allowed;
+    transform: none;
+  }
+  .btn-generate .gold-dot {
+    width: 8px; height: 8px;
+    background: var(--gold);
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* Loading */
+  .spinner {
+    width: 18px; height: 18px;
+    border: 2.5px solid rgba(255,255,255,.3);
+    border-top-color: var(--white);
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Output section */
+  .outputs-section { display: none; }
+  .outputs-section.visible { display: block; }
+
+  .output-card {
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+  .output-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: var(--purple-light);
+    border-bottom: 1px solid rgba(73,14,111,.1);
+    cursor: pointer;
+  }
+  .output-card-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--purple);
+    text-transform: uppercase;
+    letter-spacing: .5px;
+  }
+  .output-card-chevron {
+    font-size: 12px;
+    color: var(--purple);
+    transition: transform .2s;
+  }
+  .output-card.collapsed .output-card-chevron { transform: rotate(-90deg); }
+  .output-card-body {
+    padding: 16px;
+  }
+  .output-card.collapsed .output-card-body { display: none; }
+
+  .output-text {
+    font-size: 14px;
+    line-height: 1.65;
+    color: var(--gray-800);
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .output-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+  }
+  .btn-copy, .btn-share {
+    flex: 1;
+    min-width: 100px;
+    padding: 10px 14px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all .15s;
+    -webkit-appearance: none;
+  }
+  .btn-copy {
+    background: var(--gray-100);
+    color: var(--gray-800);
+    border: 1.5px solid var(--gray-200);
+  }
+  .btn-copy.copied {
+    background: var(--green-light);
+    color: var(--green);
+    border-color: var(--green);
+  }
+  .btn-share {
+    background: var(--purple);
+    color: var(--white);
+  }
+
+  /* Success banner */
+  .success-banner {
+    background: var(--purple);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .success-banner .gold-badge {
+    background: var(--gold);
+    color: var(--purple);
+    font-weight: 800;
+    font-size: 14px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    flex-shrink: 0;
+  }
+  .success-banner p {
+    font-size: 13px;
+    color: rgba(255,255,255,.9);
+    line-height: 1.4;
+  }
+
+  /* Error */
+  .error-msg {
+    background: #fef2f2;
+    border: 1.5px solid #fca5a5;
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    font-size: 13px;
+    color: #b91c1c;
+    margin-bottom: 12px;
+    display: none;
+  }
+  .error-msg.visible { display: block; }
+
+  /* Divider */
+  .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--gray-400);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 4px 0 8px;
+  }
+
+  /* Helper text */
+  .helper {
+    font-size: 12px;
+    color: var(--gray-400);
+    margin-top: 4px;
+  }
+</style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-logo">📋</div>
+  <h1>Incident Comms</h1>
+  <p>EMS Staff Only</p>
+  <div class="login-box">
+    <label>Password</label>
+    <input type="password" id="passwordInput" placeholder="Enter password" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="btn-login" onclick="doLogin()">Sign In</button>
+    <div class="login-error" id="loginError">Incorrect password. Try again.</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div class="app-wrapper" id="appWrapper">
+
+<div class="header">
+  <div class="header-inner">
+    <div class="header-icon">📋</div>
+    <div>
+      <h1>Incident Comms</h1>
+      <p>EMS · Generate all 4 outputs in one shot</p>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- Incident Details -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-header-icon">📝</span>
+      <h2>Incident Details</h2>
+    </div>
+    <div class="card-body">
+      <div class="field">
+        <label>Student Name</label>
+        <input type="text" id="studentName" placeholder="First Last" autocomplete="off">
+      </div>
+      <div class="field">
+        <label>Grade</label>
+        <select id="grade">
+          <option value="">Select grade</option>
+          <option>6th</option>
+          <option>7th</option>
+          <option>8th</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Incident Type</label>
+        <select id="incidentType">
+          <option value="">Select type</option>
+          <option>Physical altercation / fighting</option>
+          <option>Aggressive behavior (non-physical)</option>
+          <option>Defiance / disrespect toward staff</option>
+          <option>Bullying — verbal</option>
+          <option>Bullying — social / relational</option>
+          <option>Bullying — physical</option>
+          <option>Harassment / inappropriate language</option>
+          <option>Destruction of property</option>
+          <option>Academic dishonesty / cheating</option>
+          <option>Technology violation</option>
+          <option>Dress code</option>
+          <option>Cafeteria / hallway behavior</option>
+          <option>Substance / contraband</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>What happened</label>
+        <textarea id="incidentDesc" placeholder="Brief description — who, what, where, when. Include any witnesses or contributing factors." rows="4"></textarea>
+      </div>
+      <div class="field">
+        <label>Prior history with this student <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
+        <textarea id="priorHistory" placeholder="e.g. 2nd referral this month, previous parent contact on 5/12, pattern of defiance with Mr. Smith..." rows="2"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- Consequence & Next Steps -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-header-icon">⚖️</span>
+      <h2>Consequence &amp; Next Steps</h2>
+    </div>
+    <div class="card-body">
+      <div class="field">
+        <label>Consequence assigned</label>
+        <select id="consequence">
+          <option value="">Select consequence</option>
+          <option>Warning / verbal correction</option>
+          <option>Teacher lunch detention</option>
+          <option>Admin lunch detention</option>
+          <option>After school detention (ASD)</option>
+          <option>In-school suspension (ISS)</option>
+          <option>Out-of-school suspension (OSS)</option>
+          <option>Camp Mountaineer referral</option>
+          <option>Trailback Panel</option>
+          <option>Parent conference required</option>
+          <option>No consequence — informational contact</option>
+          <option>Other / pending</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Next steps / follow-up <span style="font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
+        <textarea id="nextSteps" placeholder="e.g. counselor follow-up scheduled, restorative conversation with teacher, no contact order with another student..." rows="2"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tone -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-header-icon">🎯</span>
+      <h2>Tone</h2>
+    </div>
+    <div class="card-body">
+      <div class="tone-row">
+        <button class="tone-chip active" data-tone="warm-direct" onclick="setTone(this)">Warm &amp; Direct</button>
+        <button class="tone-chip" data-tone="firm-formal" onclick="setTone(this)">Firm &amp; Formal</button>
+        <button class="tone-chip" data-tone="just-facts" onclick="setTone(this)">Just the Facts</button>
+        <button class="tone-chip" data-tone="urgent" onclick="setTone(this)">Urgent / Serious</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Outputs to Generate -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-header-icon">📤</span>
+      <h2>Outputs to Generate</h2>
+    </div>
+    <div class="card-body">
+      <div class="output-toggles">
+        <button class="toggle-chip active" data-out="call" onclick="toggleOutput(this)">
+          <span class="check">✓</span> 📞 Call Script
+        </button>
+        <button class="toggle-chip active" data-out="email" onclick="toggleOutput(this)">
+          <span class="check">✓</span> ✉️ Parent Email
+        </button>
+        <button class="toggle-chip active" data-out="file" onclick="toggleOutput(this)">
+          <span class="check">✓</span> 📁 File Doc
+        </button>
+        <button class="toggle-chip active" data-out="ps" onclick="toggleOutput(this)">
+          <span class="check">✓</span> 💻 PS Note
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error -->
+  <div class="error-msg" id="errorMsg"></div>
+
+  <!-- Generate Button -->
+  <button class="btn-generate" id="generateBtn" onclick="generate()">
+    <span class="gold-dot"></span>
+    Generate Outputs
+  </button>
+
+  <!-- Output Section -->
+  <div class="outputs-section" id="outputsSection">
+    <div class="success-banner">
+      <span class="gold-badge">✓</span>
+      <p>All outputs generated. Tap any section to expand, then copy or share.</p>
+    </div>
+    <div id="outputCards"></div>
+  </div>
+
+</div>
+
+<script>
+  // State
+  let selectedTone = 'warm-direct';
+  let selectedOutputs = new Set(['call', 'email', 'file', 'ps']);
+
+  function setTone(btn) {
+    document.querySelectorAll('.tone-chip').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    selectedTone = btn.dataset.tone;
+  }
+
+  function toggleOutput(btn) {
+    const key = btn.dataset.out;
+    if (selectedOutputs.has(key)) {
+      if (selectedOutputs.size === 1) return; // keep at least one
+      selectedOutputs.delete(key);
+      btn.classList.remove('active');
+      btn.querySelector('.check').textContent = '';
+    } else {
+      selectedOutputs.add(key);
+      btn.classList.add('active');
+      btn.querySelector('.check').textContent = '✓';
+    }
+  }
+
+  function getToneLabel() {
+    const map = {
+      'warm-direct': 'warm but direct, relationship-first — like a trusted adult who cares about the student and wants to partner with the family',
+      'firm-formal': 'firm and professional — clear expectations, formal tone, factual',
+      'just-facts': 'brief and factual — minimal commentary, just what happened and what comes next',
+      'urgent': 'serious and urgent — this is a significant matter requiring immediate family attention and action'
+    };
+    return map[selectedTone] || 'warm but direct';
+  }
+
+  function buildPrompt(data) {
+    const outputList = [];
+    if (selectedOutputs.has('call')) outputList.push('CALL SCRIPT');
+    if (selectedOutputs.has('email')) outputList.push('PARENT EMAIL');
+    if (selectedOutputs.has('file')) outputList.push('FILE DOCUMENTATION');
+    if (selectedOutputs.has('ps')) outputList.push('POWERSCHOOL NOTE');
+
+    return 'You are helping an Assistant Principal at Ephrata Middle School (EMS) generate parent communication and documentation after a student incident. ' +
+      'Generate the requested outputs using the incident details below. ' +
+      'Tone for all outputs: ' + getToneLabel() + '. ' +
+      'The AP\'s name is Mr. Schuck. School: Ephrata Middle School. Do not include a phone number or email — the parent will fill those in. ' +
+      'Be specific and concrete — use the actual details provided, don\'t be vague or generic. ' +
+      '\n\nINCIDENT DETAILS:' +
+      '\nStudent: ' + data.studentName + ' (' + data.grade + ' grade)' +
+      '\nIncident Type: ' + data.incidentType +
+      '\nWhat happened: ' + data.incidentDesc +
+      (data.priorHistory ? '\nPrior history: ' + data.priorHistory : '') +
+      '\nConsequence: ' + data.consequence +
+      (data.nextSteps ? '\nNext steps: ' + data.nextSteps : '') +
+      '\n\nGenerate ONLY these outputs: ' + outputList.join(', ') + '.' +
+      '\n\nFormat your response using these exact section headers (only include sections requested):' +
+      (selectedOutputs.has('call') ? '\n\n### CALL SCRIPT\n[A conversational phone script with an opening, incident summary, consequence, and closing. Include natural-sounding language and a moment for parent response. Keep under 200 words.]' : '') +
+      (selectedOutputs.has('email') ? '\n\n### PARENT EMAIL\n[Subject line first, then full email body. Professional but warm. Under 200 words.]' : '') +
+      (selectedOutputs.has('file') ? '\n\n### FILE DOCUMENTATION\n[Formal third-person incident record suitable for the student\'s discipline file. Include date placeholder [DATE], time placeholder [TIME], location, what occurred, consequence assigned, and any follow-up. 3-5 sentences.]' : '') +
+      (selectedOutputs.has('ps') ? '\n\n### POWERSCHOOL NOTE\n[Brief 1-3 sentence note for PowerSchool log entry. No formatting — plain text only. Start with the incident type and date placeholder [DATE].]' : '');
+  }
+
+  async function generate() {
+    const studentName = document.getElementById('studentName').value.trim();
+    const grade = document.getElementById('grade').value;
+    const incidentType = document.getElementById('incidentType').value;
+    const incidentDesc = document.getElementById('incidentDesc').value.trim();
+    const consequence = document.getElementById('consequence').value;
+    const priorHistory = document.getElementById('priorHistory').value.trim();
+    const nextSteps = document.getElementById('nextSteps').value.trim();
+
+    const errorMsg = document.getElementById('errorMsg');
+    errorMsg.classList.remove('visible');
+
+    if (!studentName || !grade || !incidentType || !incidentDesc || !consequence) {
+      errorMsg.textContent = 'Please fill in student name, grade, incident type, description, and consequence before generating.';
+      errorMsg.classList.add('visible');
+      return;
+    }
+
+    const btn = document.getElementById('generateBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<div class="spinner"></div> Generating...';
+
+    const outputsSection = document.getElementById('outputsSection');
+    outputsSection.classList.remove('visible');
+
+    try {
+      const prompt = buildPrompt({ studentName, grade, incidentType, incidentDesc, priorHistory, consequence, nextSteps });
+
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 1000,
+          system: 'You are a professional school communication assistant. Generate clear, specific, appropriately-toned outputs. Follow the format exactly. Do not add extra commentary before or after the requested sections.',
+          messages: [{ role: 'user', content: prompt }]
+        })
+      });
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error?.message || 'API error');
+
+      const text = data.content.find(b => b.type === 'text')?.text || '';
+      renderOutputs(text);
+
+    } catch (err) {
+      errorMsg.textContent = 'Something went wrong: ' + err.message;
+      errorMsg.classList.add('visible');
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = '<span class="gold-dot"></span> Regenerate';
+    }
+  }
+
+  function renderOutputs(text) {
+    const sections = [
+      { key: 'call',  label: 'Call Script',       icon: '📞', header: '### CALL SCRIPT' },
+      { key: 'email', label: 'Parent Email',       icon: '✉️',  header: '### PARENT EMAIL' },
+      { key: 'file',  label: 'File Documentation', icon: '📁', header: '### FILE DOCUMENTATION' },
+      { key: 'ps',    label: 'PowerSchool Note',   icon: '💻', header: '### POWERSCHOOL NOTE' }
+    ];
+
+    const outputCards = document.getElementById('outputCards');
+    outputCards.innerHTML = '';
+
+    // Parse sections from text
+    const parsed = {};
+    sections.forEach((sec, i) => {
+      const start = text.indexOf(sec.header);
+      if (start === -1) return;
+      const nextHeaders = sections.slice(i + 1).map(s => s.header);
+      let end = text.length;
+      nextHeaders.forEach(h => {
+        const idx = text.indexOf(h, start + sec.header.length);
+        if (idx !== -1 && idx < end) end = idx;
+      });
+      parsed[sec.key] = text.slice(start + sec.header.length, end).trim();
+    });
+
+    // Render each selected section
+    sections.forEach((sec, idx) => {
+      if (!selectedOutputs.has(sec.key)) return;
+      const content = parsed[sec.key] || '[No content generated for this section]';
+
+      const card = document.createElement('div');
+      card.className = 'output-card';
+      card.id = 'outCard-' + sec.key;
+
+      card.innerHTML =
+        '<div class="output-card-header" onclick="toggleCard(\'' + sec.key + '\')">' +
+          '<div class="output-card-title">' +
+            '<span>' + sec.icon + '</span>' +
+            '<span>' + sec.label + '</span>' +
+          '</div>' +
+          '<span class="output-card-chevron" id="chev-' + sec.key + '">▾</span>' +
+        '</div>' +
+        '<div class="output-card-body">' +
+          '<div class="output-text" id="outText-' + sec.key + '">' + escapeHtml(content) + '</div>' +
+          '<div class="output-actions">' +
+            '<button class="btn-copy" id="copyBtn-' + sec.key + '" onclick="copySection(\'' + sec.key + '\')">' +
+              '📋 Copy' +
+            '</button>' +
+            (sec.key === 'email' ?
+              '<button class="btn-share" onclick="openEmail(\'' + sec.key + '\')">' +
+                '✉️ Open in Mail' +
+              '</button>' : '') +
+          '</div>' +
+        '</div>';
+
+      outputCards.appendChild(card);
+    });
+
+    const outputsSection = document.getElementById('outputsSection');
+    outputsSection.classList.add('visible');
+    outputsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function toggleCard(key) {
+    const card = document.getElementById('outCard-' + key);
+    card.classList.toggle('collapsed');
+  }
+
+  function copySection(key) {
+    const text = document.getElementById('outText-' + key).textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.getElementById('copyBtn-' + key);
+      btn.textContent = '✓ Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.innerHTML = '📋 Copy';
+        btn.classList.remove('copied');
+      }, 2000);
+    });
+  }
+
+  function openEmail(key) {
+    const text = document.getElementById('outText-' + key).textContent;
+    const lines = text.split('\n');
+    let subject = '';
+    let body = text;
+    if (lines[0].toLowerCase().startsWith('subject:')) {
+      subject = lines[0].replace(/^subject:\s*/i, '').trim();
+      body = lines.slice(1).join('\n').trim();
+    }
+    const mailto = 'mailto:?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+    window.location.href = mailto;
+  }
+
+  function escapeHtml(str) {
+    return str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  // ── PASSWORD ──
+  const STAFF_PW = 'Schuck50';
+
+  function doLogin() {
+    const val = document.getElementById('passwordInput').value;
+    if (val === STAFF_PW) {
+      document.getElementById('loginScreen').classList.add('hidden');
+      document.getElementById('appWrapper').classList.add('visible');
+      sessionStorage.setItem('ems_comms_auth', '1');
+    } else {
+      document.getElementById('loginError').classList.add('visible');
+      document.getElementById('passwordInput').value = '';
+    }
+  }
+
+  // Stay logged in within the same tab session
+  if (sessionStorage.getItem('ems_comms_auth') === '1') {
+    document.getElementById('loginScreen').classList.add('hidden');
+    document.getElementById('appWrapper').classList.add('visible');
+  }
+</script>
+
+</div> <!-- /app-wrapper -->
+</body>
+</html>
