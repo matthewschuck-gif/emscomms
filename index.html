@@ -501,23 +501,34 @@
         </select>
       </div>
       <div class="field">
-        <label>Incident Type</label>
+        <label>Incident Type (PowerSchool Code)</label>
         <select id="incidentType">
           <option value="">Select type</option>
-          <option>Physical altercation / fighting</option>
-          <option>Aggressive behavior (non-physical)</option>
-          <option>Defiance / disrespect toward staff</option>
-          <option>Bullying — verbal</option>
-          <option>Bullying — social / relational</option>
-          <option>Bullying — physical</option>
-          <option>Harassment / inappropriate language</option>
-          <option>Destruction of property</option>
-          <option>Academic dishonesty / cheating</option>
-          <option>Technology violation</option>
-          <option>Dress code</option>
-          <option>Cafeteria / hallway behavior</option>
-          <option>Substance / contraband</option>
-          <option>Other</option>
+          <option>61 — Late to School</option>
+          <option>62 — Late to Class</option>
+          <option>63 — Cut/Left Class w/Permission</option>
+          <option>64 — Cut Admin Detention</option>
+          <option>65 — Cut Teacher Detention</option>
+          <option>66 — Leave School w/o Permission</option>
+          <option>67 — In Unauthorized Area</option>
+          <option>68 — Theft of Item</option>
+          <option>70 — Out of Assigned Area</option>
+          <option>71 — Cheating/Plagiarism</option>
+          <option>72 — Forgery</option>
+          <option>73 — Lying / False Info</option>
+          <option>81 — Profanity / Gesture / Communication</option>
+          <option>82 — Disrespect</option>
+          <option>83 — Insubordination/Defiance</option>
+          <option>84 — Disrupting Educational Environment</option>
+          <option>85 — Reckless/Horseplay/Shoving</option>
+          <option>86 — Improper 911/Emergency Use</option>
+          <option>91 — Dress Code Violation</option>
+          <option>92 — Public Display of Affection</option>
+          <option>93 — Cell Phone Violation</option>
+          <option>94 — Food/Beverage Violation</option>
+          <option>95 — Internet/Computer Violation</option>
+          <option>96 — Bus Referral</option>
+          <option>99 — Other</option>
         </select>
       </div>
       <div class="field">
@@ -712,9 +723,12 @@
     try {
       const prompt = buildPrompt({ studentName, grade, incidentType, incidentDesc, priorHistory, consequence, nextSteps });
 
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
+      const response = await fetch('https://yvutgnpgnthvnonhgdux.supabase.co/functions/v1/anthropic-proxy', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl2dXRnbnBnbnRodm5vbmhnZHV4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3NDIzNzgsImV4cCI6MjA5NTMxODM3OH0.bX5eI0EgnlQEjThX0CVpWFj1SNI726OxBwKpTgAv2Ak'
+        },
         body: JSON.stringify({
           model: 'claude-sonnet-4-20250514',
           max_tokens: 1000,
@@ -841,7 +855,7 @@
   }
 
   // ── PASSWORD ──
-  const STAFF_PW = 'Schuck50';
+  const STAFF_PW = 'Schuck26';
 
   function doLogin() {
     const val = document.getElementById('passwordInput').value;
